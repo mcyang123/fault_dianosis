@@ -32,7 +32,7 @@ Email: siyang\_liu@foxmail.com; xusun@eee.hku.hk; wcxu@gdut.edu.cn}
 
 \begin{abstract}
 %\boldmath
-Motivated by the increasing importance of energy conversion devices and their widespread use in uncountable applications, research concerning power electronic fault diagnosis has recently experienced extraordinarily dynamic activity. This paper proposes a simple yet effective method for detecting and locating open-circuit fault  in multi-phase interleaved DC-DC converters. Firstly, we obtain a linear model  by exploiting the relationship between the DC-link current and $n$ phase currents based on signal decomposition. A least squares method is then applied to identify this model and the estimated parameters immediately reveal the occurrence as well as the location of  open-circuit fault in multi-phase interleaved DC-DC converters. Simulations results show that our method could accurately diagnosis  open-circuit faults in a switching cycle, even if more than one faults occur at the same time.
+$Motivated by the increasing importance of energy conversion devices and their widespread use in uncountable applications, research concerning power electronic fault diagnosis has recently experienced extraordinarily dynamic activity. This paper proposes a simple yet effective method for detecting and locating open-circuit fault  in multi-phase interleaved DC-DC converters. Firstly, we obtain a linear model  by exploiting the relationship between the DC-link current and $n$ phase currents based on signal decomposition. A least squares method is then applied to identify this model and the estimated parameters immediately reveal the occurrence as well as the location of  open-circuit fault in multi-phase interleaved DC-DC converters. Simulations results show that our method could accurately diagnosis  open-circuit faults in a switching cycle, even if more than one faults occur at the same time.
 \end{abstract}
 
 % no keywords
@@ -50,14 +50,15 @@ There are two different types of the switching device fault: short-circuit fault
 
 Unlike other converter topologies, open-circuit faults in one branch of Multi-phase interleaved converters will not cause system shut down, but will degrade its performance, especially in loss of advantages related to low current ripple. Therefore, open-circuit fault diagnosis is necessary for enhancing system stability. Once diagnosed, fault tolerance strategy could be employed only by adjusting control signals for the rest healthy IGBTs in order to prevent further damages.
 
-As the requirement of reliability rises, a large number of open-circuit fault diagnostic methods for DC-DC converters have been proposed. Methods present in \cite{park2014open,Sheng2008A} can be only used to certain DC-DC converters but cannot be extended to general topologies. Fault diagnosis methods based on the magnetic near-field waveforms are introduced in \cite{Nie2014Fault,Chen2011Monitoring}. However, these methods are leading to the complicated calculation, which requires long processing time. Also, magnetic near-field probes are expensive and difficult to fix. In \cite{Farjah2016Application} a new type of Rogowski coil sensor is presented for fault diagnosis of non-isolated single switch DC-DC converters. In \cite{Ribeiro2014Open} fault diagnosis for interleaved DC-DC converter is carried out by analyzing DC-link current and switch gate signals.
+As the requirement of reliability rises, a large number of open-circuit fault diagnostic methods for DC-DC converters have been proposed. Methods present in \cite{park2014open,Sheng2008A} can be only used to certain DC-DC converters but cannot be extended to general topologies. Fault diagnosis methods based on the magnetic near-field waveforms are introduced in \cite{Nie2014Fault,Chen2011Monitoring}. However, these methods are leading to the complicated calculation, which requires long processing time. Also, magnetic near-field probes are expensive and difficult to fix. In \cite{Farjah2016Application} a new type of Rogowski coil sensor is presented for fault diagnosis of non-isolated single switch DC-DC converters. In \cite{Ribeiro2014Open} fault diagnosis for interleaved DC-DC converter is carried out by analyzing input current and switch gate signals.
 
-In this paper, a simple yet effective fault diagnosis method is presented for multi-phase interleaved DC-DC converters. This method is based on signal decomposition, using only DC-link current,switch gate signals,and a period of pre-stored inductor phase current value, instead of monitoring inductor current of each phases. Building a linear model based  on the common relationship between input current and inductor phase currents, our method could be applied on all kinds of interleaved DC-DC converters and be easily generalized to $n$ phase.
+In this paper, a simple yet effective fault diagnosis method is presented for multi-phase interleaved DC-DC converters. This method is based on signal decomposition, using only DC-link current,switch gate signals,and a period of pre-stored inductor phase current value, instead of monitoring inductor current of each phases. A linear model is built based on the fact that input current equals to the sum of each inductor phase current. By estimating model parameters, we can obtain the conditions all phases within one switching cycle. Using only the common relationship between input current and inductor phase currents, our method could be applied on all kinds of interleaved DC-DC converters and be easily generalized to $n$ phase. Effectiveness and robustness of our method are evaluate by simulations.
 
+The rest part of this paper is organized as follows. In section \uppercase\expandafter{\romannumeral2},3-phase interleaved boost converter is chosen as an example for analyzing circuit principle.Our fault diagnosis method is presented in section \uppercase\expandafter{\romannumeral3}. Then in section \uppercase\expandafter{\romannumeral4}, the method is verified by simulations. Finally, discussion and conclusions are provided in section \uppercase\expandafter{\romannumeral5} and section \uppercase\expandafter{\romannumeral6}, respectively.
 
 \section{Multi-phase interleaved DC-DC converter} \label{sec:converter}
 
-Multi-phase converters usually consist of parallel basic converters including boost converter and buck converter. With a phase-shift angle, current ripple in each phase of multi-phase converter could cancel each other, and hence reduce the DC-link current ripple, which improves efficiency and simpler filtering. Besides, simple fault tolerant strategy could be applied to this topology. When an open-circuit fault (OCF) occurs in one phase, we could readapt the phase-shift angle between the converter phases using only the rest healthy ones, so as to reduce current ripple and avoid further damage.
+Multi-phase converters consist of parallel basic converters including boost converter and buck converter. With a phase-shift angle, current ripple in each phase of multi-phase converter could cancel each other, and hence reduce the DC-link current ripple, which improves efficiency and simpler filtering. Besides, simple fault tolerant strategy could be applied to this topology. When an open-circuit fault (OCF) occurs in one phase, we could readapt the phase-shift angle between the converter phases using only the rest healthy ones, so as to reduce current ripple and avoid further damage.
 
 Even though different basic converters have different effects, they share similar mechanisms and current waveforms, which means our analysis and conclusions on one kind could be easily generalized to another. In this paper, the multi-phase interleaved boost converter (IBC) is chosen to study its normal and faulty operating mode.
 
@@ -67,6 +68,12 @@ A schematic of a 3-phase interleaved boost converter (IBC) is shown in Fig.1 \re
 \begin{figure}  \label{fig:1}
 \centerline{\includegraphics[width=0.45\textwidth]{Fig1.pdf}}
 \caption{Three-phase interleaved DC-DC boost converter}
+\end{figure}
+
+IBC can work in two modes: continuous-current conduction mode (CCM) and discontinuous-current conduction mode (DCM), depending on whether the phase current decrease to zero in one period. Switching signal and inductor phase current of each mode are shown in Fig.2.
+\begin{figure}[!hbtp] \label{fig:2}
+\centerline{\includegraphics[width=0.3\textwidth]{fig2.pdf}}
+\caption{(a) Switching signal, inductor phase current for CCM and DCM;(b) Three phase Switching signal, three phase inductor phase current and input current}
 \end{figure}
 
 Inspired by~[14],our attention is driven to the DC-link current, which contains information of each phase. According to Kirchhoff¡¯s current law (KCL), the sum of currents flowing into that node is equal to the sum of currents flowing out of that node. Therefore the input current $I_{in}$ is equal to the sum of each phase current.\\
@@ -91,18 +98,13 @@ Where $V_{k}$ is negative(Vin$<$Vout). The inductor phase current will decrease 
 \frac{di_{k}}{dt}=\frac{V_{i}-V_{o}}{L},(k=1,2,3,...)
 \end{equation}
 
-According to \eqref{eq:3}, if  output side capacitor is large enough, the output voltage ripple will be small, which means the discharging speed could be consider invariant. In the interval $[DT,DAT]$, in which D is the duty cycle and $D_{A}$ is the proportion of a period when the inductor current is not zero.
+If  output side capacitor is large enough, the output voltage ripple will be small. In this case, $V_{o}$ is considered changeless. According to \eqref{eq:3} and \eqref{eq:4} discharging speed could be consider invariant. In the interval $[DT,DAT]$, in which D is the duty cycle and $D_{A}$ is the proportion of a period when the inductor current is not zero.
 
-IBC can work in two modes: continuous-current conduction mode (CCM) and discontinuous-current conduction mode (DCM), depending on whether the phase current decrease to zero during one period. Switching signal, inductor phase currents of each mode are shown in Fig.2(a). ..... are shown in ...
-\begin{figure}[!hbtp] \label{fig:2}
-\centerline{\includegraphics[width=0.3\textwidth]{fig2.pdf}}
-\caption{(a) Switching signal, inductor phase current for CCM and DCM;(b) Three phase Switching signal, three phase inductor phase current and input current}
-\end{figure}
-
-From Fig.2 \ref{fig:2}, we can come to two conclusions:
+In normal operation of IBC, switching signals are periodic, thus inductor phases currents are also periodic.For multi-phase converter, circuit parameters of each phase are usually identical. If switching signals are symmetric, inductor phases currents would also be symmetric,with a certain phase-shift angle. Current waveforms of a 3-phase IBC are shown in Fig.3, including switching signals, inductor phase currents and input current.
+From latter analysis, we  summarize 2 features of inductor phase current waveforms here:
 \begin{itemize}
-\item{Inductor phase current waveforms are periodic}\label{con:1}
-\item{Inductor current waveform of one phase is similar to another, with a phase-shift angle of $2\pi/3$ radians.}\label{con:2}
+\item{Feature1:Inductor phase current waveforms are periodic}\label{con:1}
+\item{Feature2:Inductor current waveform of one phase is similar to another, with a phase-shift angle of $2\pi/3$ radians.}\label{con:2}
 \end{itemize}
 
 For two operating modes mentioned above, the relationship between input voltage and output voltage, according to \cite{Mohan1995Power} is\\
