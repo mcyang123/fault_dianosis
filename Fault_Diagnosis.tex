@@ -1,0 +1,327 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage[cmex10]{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\usepackage{tikz,pgfplots}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{subfigure}
+\usepackage{cite}
+\usepackage{subfigure}
+
+%\newcommand{\bolda}{\underline{\boldsymbol{\alpha}}}
+%\newcommand{\brac}[2]{$\Vert #1\qquad #2 \Vert^2_2$}
+\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+
+\begin{document}
+
+\title{Open-Circuit Fault Diagnosis for Interleaved DC-DC Converters Based on Signal Decomposition and Least Squares Identification Methods}
+
+\author{
+\IEEEauthorblockN{Siyang Liu$^*$, Junjie Yang$^*$, Xu Sun$^\dagger$, Weichao Xu$^*$, and Qiyu Yang$^*$}
+\IEEEauthorblockA{$^*$Department of Automatic Control, School of Automation,\\
+Guangdong University of Technology, Guangzhou, P. R. China\\
+$^\dagger$Department of Electrical and Electronic Engineering,\\
+The University of Hong Kong, Pokfulam Road, Hong Kong\\
+Email: siyang\_liu@foxmail.com; xusun@eee.hku.hk; wcxu@gdut.edu.cn}
+}
+\maketitle
+
+\begin{abstract}
+%\boldmath
+Motivated by the increasing importance of energy conversion devices and their widespread use in uncountable applications, research concerning power electronic fault diagnosis has recently experienced extraordinarily dynamic activity. This paper proposes a simple yet effective method for detecting and localizing open-circuit fault mode in multi-phase interleaved DC-DC converters. Firstly, we obtain a linear model  by exploiting the relationship between the DC-link current and $n$ phase currents based on signal decomposition in normal mode. A least squares method is then applied to identify this model and the estimated coefficients immediately reveal the occurrence as well as the location of the open-circuit fault in multi-phase interleaved DC-DC converters. Simulations results show...
+\end{abstract}
+
+% no keywords
+\begin{IEEEkeywords}
+Fault diagnosis; interleaved DC-DC converter; signal decomposition; system identification; least squares method.
+\end{IEEEkeywords}
+
+\section{Introduction} \label{sec:intro}
+
+In order to meet the tightening requirements of power quality, power supplies are usually required to operate at high power factor and to draw low harmonic currents from the mains. Since the conventional method of reducing input current harmonics using an LC input filter is no longer sufficient to meet the requirements in many industrial applications \cite{Lee2000Steady}, multi-phase interleaved converters are now widely applied in wind turbine systems \cite{Zhang2016A} and hybrid electric vehicles \cite{Kimura2014Downsizing}, etc.  %%add references-----------------------------%%%
+
+Multi-phase interleaved converters, comprising of $n$ paralleling modular converters, have advantages including volume reducing, high conversion efficiency, small current ripple, and low voltage stress on devices comparing to other topologies\cite{Chen2009Research}. Most of the converters use IGBT as their switching devices because of their high voltage and current ratings and ability to transiently handle short-circuit currents. Even so, switching devices are still considered the most fragile due to the excess electrical and thermal stresses \cite{Nie2014Fault}.
+
+There are two different types of the switching device fault: short-circuit fault and open-circuit fault. Short-circuit faults, usually caused by wrong gating signals, overvoltage, or high temperature, could lead to additional damage to other components in the circuit, so it should be treated quickly and cautiously. Therefore, the fault diagnosis and fault-tolerant control methods for short-circuit faults are usually based on hardware implementation \cite{Choi2014Diagnosis}. Open-circuit faults are usually caused by excessive current, overtemperature and component aging. They might result in current distortion \cite{Lu2008A}, but do not  cause ditional serious damage to the system \cite{park2014open}.
+
+Unlike other converter topologies, open-circuit faults in one branch of Multi-phase interleaved converters will not cause system shut down, but will degrade its performance, especially in loss of advantages related to low current ripple. Therefore, open-circuit fault diagnosis is necessary for enhancing system stability. Once diagnosed, fault tolerance strategy could be employed only by adjusting control signals for the rest healthy IGBTs in order to prevent further damages.
+
+As the requirement of reliability rises, a large number of open-circuit fault diagnostic methods for DC-DC converters have been proposed. Methods present in \cite{park2014open,Sheng2008A} can be only used to certain DC-DC converters but cannot be extended to general topologies. Fault diagnosis methods based on the magnetic near-field waveforms are introduced in \cite{Nie2014Fault,Chen2011Monitoring}. However, these methods are leading to the complicated calculation, which requires long processing time. Also, magnetic near-field probes are expensive and difficult to fix. In \cite{Farjah2016Application} a new type of Rogowski coil sensor is presented for fault diagnosis of non-isolated single switch DC-DC converters. In \cite{Ribeiro2014Open} fault diagnosis for interleaved DC-DC converter is carried out by analyzing DC-link current and switch gate signals.
+
+In this paper, a simple yet effective fault diagnosis method based on signal decomposition is presented for multi-phase interleaved DC-DC converters. This method uses only DC-link current,switch gate signals,and a period of pre-stored inductor phase current value, instead of monitoring inductor current of each phases, thus it is economical. From the viewpoint of signal processing, this method dose not need to analyze the circuit principle, hence it could be applied on basic converters and be easily generalized to $n$ phase.
+
+\section{Multi-phase interleaved DC-DC converter} \label{sec:converter}
+
+Multi-phase converters usually consist of parallel basic converters including boost converter and buck converter. With a phase-shift angle, current ripple in each phase of multi-phase converter could cancel each other, and hence reduce the DC-link current ripple, which improves efficiency and simpler filtering. Besides, simple fault tolerant strategy could be applied to this topology. When an open-circuit fault (OCF) occurs in one phase, we could readapt the phase-shift angle between the converter phases using only the rest healthy ones, so as to reduce current ripple and avoid further damage.
+
+Even though different basic converters have different effects, they share similar mechanisms and current waveforms, which means our analysis and conclusions on one kind could be easily generalized to another. In this paper, the multi-phase interleaved boost converter (IBC) is chosen to study its normal and faulty operating mode.
+
+\subsection{Interleaved Boost Converter Topology and Operating Principle}
+
+A schematic of a 3-phase interleaved boost converter (IBC) is shown in Fig.1 \ref{fig:2}. Each phase of that converter is controlled with the same switching frequency and has the same phase-shift angle of $ \pi/3$ radians.
+\begin{figure}  \label{fig:1}
+\centerline{\includegraphics[width=0.45\textwidth]{Fig1.pdf}}
+\caption{Three-phase interleaved DC-DC boost converter}
+\end{figure}
+
+Inspired by~[14],our attention is driven to the DC-link current, which contains information of each phase. According to Kirchhoff¡¯s current law (KCL), the sum of currents flowing into that node is equal to the sum of currents flowing out of that node. Therefore the input current $I_{in}$ is equal to the sum of each phase current.\\
+\begin{equation}\label{eq:kcl}
+I_{in}=I_{1}+I_{2}+I_{3}
+\end{equation}
+
+When the IGBT turns on, the inductor phase voltage is equal to the input voltage Vin, and the inductor is charged by the power source. The rising speed of inductor phase current is\\
+\begin{equation}\label{eq:2}
+\frac{di_{k}}{dt}=\frac{V_{in}}{L},(k=1,2,3,...)
+\end{equation}
+
+Since $V_{in}$ and L are constant in a certain circuit, the charging speed of the inductor is also considered invariant. In the interval $[T, T+DT]$, the inductor current waveform is a straight line.
+
+When the IGBT turns off, the inductor starts discharging. The inductor voltage results from\\
+\begin{equation}\label{eq:3}
+V_{k}=V_{in}-V_{out}
+\end{equation}
+
+Where $V_{k}$ is negative(Vin$<$Vout). The inductor phase current will decrease with the speed of\\
+\begin{equation}\label{eq:4}
+\frac{di_{k}}{dt}=\frac{V_{i}-V_{o}}{L},(k=1,2,3,...)
+\end{equation}
+
+According to \eqref{eq:3}, if  output side capacitor is large enough, the output voltage ripple will be small, which means the discharging speed could be consider invariant. In the interval $[DT,DAT]$, in which D is the duty cycle and $D_{A}$ is the proportion of a period when the inductor current is not zero.
+
+IBC can work in two modes: continuous-current conduction mode (CCM) and discontinuous-current conduction mode (DCM), depending on whether the phase current decrease to zero during one period. Switching signal, inductor phase currents of each mode are shown in Fig.2(a). ..... are shown in ...
+\begin{figure}[!hbtp] \label{fig:2}
+\centerline{\includegraphics[width=0.3\textwidth]{fig2.pdf}}
+\caption{(a) Switching signal, inductor phase current for CCM and DCM;(b) Three phase Switching signal, three phase inductor phase current and input current}
+\end{figure}
+
+From Fig.2 \ref{fig:2}, we can come to two conclusions:
+\begin{itemize}
+\item{Inductor phase current waveforms are periodic}\label{con:1}
+\item{Inductor current waveform of one phase is similar to another, with a phase-shift angle of $2\pi/3$ radians.}\label{con:2}
+\end{itemize}
+
+For two operating modes mentioned above, the relationship between input voltage and output voltage, according to \cite{Mohan1995Power} is\\
+\begin{equation}\label{eq:5}
+\frac{V_{o}}{V_{i}}=\frac{D_{A}}{D_{A}-D}
+\end{equation}
+In CCM, inductor phase currents do not decrease to zero, which means $D_{A}=1$.
+
+\subsection{Open-Circuit Fault Mode Analysis}
+Due to circuit symmetry, open-circuit faults (OCF) on each phase would be similar, so we analysis P1 of the IBC in Fig.1 as an example. When an OCF occurs in T2, according to previous analysis, the inductor begins to discharge immediately until $I_{2}$ becomes zero, as shown in Fig.3.\\
+\begin{figure}[!htb] \label{fig:3}
+\centerline{\includegraphics[width=0.4\textwidth]{Fig3.pdf}}
+\caption{Inductor phase current and input current after OCF occured at phase1 }
+\end{figure}
+As we can see in Fig.3, current waveforms of P1 and P3 are affected by the OCF happened in T2. Since one of the converter modules is not working, there is a ripple increase in DC-link current $I_{in}$  and output voltage $V_{o}$. Hence, according to \eqref{eq:3}, current declining slope of P1 and P3 also change.
+
+As mentioned above, IBC could operate in CCM and DCM. Current waveforms of P1 and P3 after OCF occurs in T2 are different in each mode, as shown in Fig.4.
+\begin{figure}[!hbtp]
+\centerline{\includegraphics[width=0.45\textwidth]{fig4.pdf}}
+\caption{Fig}
+\end{figure}
+
+ When OCF occurs in T2, this branch would shut down, leading to a duty cycle mismatch, and slight current imbalance in P1 and P3. In CCM , inductor phase currents are continuous in this mode,  imbalance in P1 and P3 will accumulate over time [see Fig.4 (a)], which indicates that current waveforms of the rest healthy phases will not remain periodic and symmetric after fault occurrence.On the contrary, in DCM inductor phase current increase from zero in each period, thus current imbalance in P1 and P3 will not add up. In this mode, we consider current waveforms of P1 and P3 not changed after T2 shuts down. Therefore, after fault occurrence in one phase, conclusion 1 and 2 still hold in the rest phases only in DCM.(After an OFT occurs, mean values of both input and output voltage do not change. According to\eqref{eq:4}, DA will remain the same, so we consider phase current waveforms of T2 and T3 not changed after T1 shuts down, regardless of  inductor discharging rate of T2 and T3 will change, due to the ripple increase of $V_{o}$.)
+
+From the analysis of open-circuit fault mode above, we could come the following conclusions:
+\begin{itemize}
+\item{When an OCF occurs in $T_{k}$, $I_{k}$ would decrease to zero from that moment. DC-link current is equal to sum of inductor current of the rest healthy phases.}\label{con:3}
+\item{In DCM, OCF in one phase will not affect inductor current waveforms of other phases.}\label{con:4}
+\end{itemize}
+
+\section{Model and Method}\label{sec:model}
+Operating principle and fault mode of an IBC are analysis in the previous section. According to the KCL law, DC-link current is equal to the sum of inductor current of each phase, which means DC-link contains information of each phase. By decomposing the DC-link current, we could obtain inductor current components, and judging by whether the current component of one phase is zero, we can tell if an OCF occurs in this phase. Since phase currents are periodic and symmetric according to conclusion 1 and 2 in section II, we can obtain phase currents by only pre-storing a period of current values of one single phase.
+
+In this section, we propose a method based on signal decomposition, using the relationship between DC-kink current and inductor phase currents. We build a linear model of DC-kink current and phase currents calculated by the pre-stored period of current values. Parameters in the model represent the working conditions of each phase intuitively. In other words, the state identification problem of each phase actually becomes the estimation problem of system parameters. Finally, a least square (LS) algorithm is applied for parameter estimation.
+
+Apparently our method requires phase currents to be periodic and symmetric regardless of the fault, so this method can only be applied in DCM mode.
+
+\subsection{System modeling}
+$I_{k}(t)$ is taken as the inductor current value of k-th phase at the time t. According to \ref{con:1} ,inductor currents are periodic
+\begin{equation}\label{eq:6}
+i_{n}(t)=i_{n}(t+T)
+\end{equation}
+According to conclusion 2, relationship between inductor phase currents is
+\begin{equation}\label{eq:7}
+i_{1}(t)=i_{2}(t+\frac{T}{n})=i_{3}(t+\frac{2T}{n})=...=i_{n}(t+\frac{(n-1)T}{n})
+\end{equation}
+According to conclusion 1 and 2, inductor phase currents are periodic and symmetric with each other. Therefore, using \eqref{eq:6} and \eqref{eq:7} we can calculate all inductor currents with only one period of current signal of one phase. Conclusion 4 makes sure that, in DCM mode, inductor current waveforms of the rest healthy phases remain the same, regardless of the OCF, and they always satisfy \eqref{eq:6} and \eqref{eq:7}.\eqref{eq:1} can be generalized to k phase as\\
+\begin{equation}\label{eq:8}
+i_{in}(t)=i_{1}(t)+i_{2}(t)+...+i_{n}(t)
+\end{equation}
+Assumed that an OCF occurs in T1, DC-link current is equal to sum of inductor currents of the rest healthy phases\\
+\begin{equation}\label{eq:9}
+i_{in}(t)=i_{2}(t)+i_{3}(t)+...+i_{n}(t)
+\end{equation}
+
+From previous analysis, when an OCF occurs in one phase, its inductor current will decrease to zero. In another word, when decomposing the DC-link current, the current component of the fault phase is also zero. In order to fit in both healthy and faulty operating mode, equation (7) can be written as follow:\\
+\begin{equation}\label{eq:10}
+i_{in}(t)=\theta_{1}\cdot i_{1}(t)+\theta_{2}\cdot i_{2}(t)+...+\theta_{n}\cdot i_{n}(t),(\theta=0,1)
+\end{equation}
+
+Apparently, when OCF occurs in $T_{k}$(k=1,2,3¡­n),$\theta_{k}$ equals to zero, and for the rest healthy ones,$\theta$ equals to 1. Parameter $\theta$ intuitively represent the working conditions of each phase, therefore solving parameter $\theta$ is the key to fault diagnosis.
+Combining equation \eqref{eq:7} and \eqref{eq:10}, we can have\\
+\begin{eqnarray}\label{eq:11}
+\lefteqn{i_{in}(t)=\theta_{1}\cdot i_{1}(t)+\theta_{2}\cdot i_{1}(t-\frac{T}{n})+{} }
+\nonumber\\
+&& {}+\theta_{n}\cdot i_{1}(t-\frac{(n-1)T)}{n}),(\theta=0,1)
+\end{eqnarray}
+According to the previous analysis, we can calculate all inductor currents with only one period of current signal of one phase. By pre-storing one period of inductor current value of T1, we can obtain other phase currents using \eqref{eq:6} and \eqref{eq:7}. Flow diagram of this method is shown as Fig.5
+\begin{figure*}[!htbp]
+\centerline{\includegraphics[width=0.8\textwidth]{fig5.pdf}}
+\caption{Fig}
+\end{figure*}
+
+In order to solve n parameters in \eqref{eq:11}, we need to establish n equations using n sets of $i_{i}$ and $i_{1}$ values, where n is the phase number of the circuit. That is to say, our diagnosis method only requires n sampling period, which is fast and requires low sampling frequency.
+
+\subsection{Least Squares Identification Methods}
+Least squares method is a common approach in parameter estimation and regression analysis, with good statistical properties and the ability to inhibit the noise in the data. This method minimizes the sum of the squares of the errors made in the results of every single equation.
+
+From analysis above, with one single period of pre-collected phase current value, we can estimate DC-link current using \eqref{eq:6}\eqref{eq:7}, and also the following equation:\\
+\begin{equation}\label{eq:12}
+\hat{i}_{in}(n)=\sum_{k=1}^{N}{\theta_{k}(n)i_{k}(n)}
+\end{equation}
+Where n is the phase number of the circuit. The error between estimated value and measured value is written as\\
+\begin{equation}\label{eq:13}
+e(n)=i_{in}(n)-\hat{i}_{in}(n)
+\end{equation}
+We choose the sum of the squares of the errors as cost function\\
+\begin{equation}\label{eq:14}
+J(n)=\sum_{q=1}^{M}{e^2(q)}=\sum_{q=1}^{M}{[i_{in}(q)-\hat{i}_{in}(q)]^2}
+\end{equation}
+Submitting \eqref{eq:12} into \eqref{eq:14}, we then have
+\begin{eqnarray}\label{eq:15}
+\lefteqn{
+J(n)=\sum_{q=1}^{M}{i^{2}_{in}(q)}-2\sum_{k=1}^{N}{\theta_{k}(n)}\sum_{q=1}^{M}{i_{in}(q)i_{k}(q)} }
+\nonumber\\
+&& {}+\sum_{m=1}^{N}{\sum_{k=1}^{N}{\theta_{k}(n)\theta_{m}(n)\sum_{q=1}^{M}{i_{k}(q)i_{m}(q)}}}
+\end{eqnarray}
+To simplify the expression, we make the following replacement:\\
+\begin{equation}\label{eq:16}
+\phi(M,k,m)=\sum_{q=1}^{M}{i_{k}(q)i_{m}(q)}\quad k,m=1,2,...,N
+\end{equation}
+\begin{equation}\label{eq:17}
+\omega(M,k)=\sum_{q=1}^{M}{i_{in}(q)i_{k}(q)}\quad k=1,2,...,N
+\end{equation}
+The cost function can now be written as\\
+\begin{eqnarray}\label{eq:18}
+\lefteqn{J(n)=\sum_{q=1}^{M}{i^{2}_{in}(q)-2\sum_{k=1}^{N}{\theta_{k}(n)\omega(M,k)}}+{}}
+\nonumber\\
+&& {}+\sum_{m=1}^{N}{\sum_{k=1}^{N}{\theta_{k}(n)\theta_{m}(n)\phi(M,k,m)}}
+\end{eqnarray}
+In order to minimize $J(n)$, we calculate its derivative and make it zero. The partial derivative of $\theta_{k}(n)$ is\\
+\begin{eqnarray}\label{eq:19}
+\lefteqn{\frac{\partial J(n)}{\partial\theta_{k}(n)}=-2\omega(M,k)+2\sum_{m=1}^{N}{\theta_{m}(n)\phi(M,k,m)}=0}
+\nonumber\\
+&& (k=1,2,...,N)
+\end{eqnarray}
+Setting the partial derivative zero, we get\\
+\begin{equation}\label{eq:20}
+\omega(M,k)=\sum_{m=1}^{N}{\theta_{m}(n)\phi(M,k,m)}\quad(k=1,2,...,N)
+\end{equation}
+The matrix form of \eqref{eq:20} is written as\\
+\begin{equation}\label{eq:21}
+\bm{\omega}(n)=\bm{\Phi}(n)\bm{\theta}(n)
+\end{equation}
+In which\\
+\begin{equation}\label{eq:22}
+\bm{\omega}(n)=[\omega(M,1)\quad \omega(M,2)\quad...\quad\omega(M,N)]^{T}
+\end{equation}
+\begin{equation}\label{eq:23}
+\bm{\theta}(n)=[\theta_{1}(n)\quad \theta_{2}(n)\quad...\quad\theta_{N}(n)]^{T}
+\end{equation}\\
+\begin{equation}\label{eq:24}
+\bm{\Phi}(n)=
+\left[
+\begin{array}{cccc}
+\phi(n,1,1)&\phi(n,1,2)&\ldots&\phi(n,1,N)\\
+\phi(n,2,1)&\phi(n,2,2)&\ldots&\phi(n,2,N)\\
+\vdots&\vdots&&\vdots\\
+\phi(n,N,1)&\phi(n,N,2)&\ldots&\phi(n,N,N)
+\end{array}
+\right]
+\end{equation}
+Where M is the data amount and N is the phase number of the circuit.Apparently $\Phi(n)$ is a full-rank matrix, there should be an inverse matrix $\phi(n)^{-1}$ of it.$\theta(n)$ in \eqref{eq:21} can result from\\
+\begin{equation}\label{eq:25}
+\bm{\theta}(n)=\bm{\Phi}(n)^{-1}\bm{\omega}(n)
+\end{equation}
+Using the DC-link current data of length M Parameter $\theta$ intuitively represents the working conditions of each phase. If $\theta_{k}$ is zero, that means phase current of $T_{k}$ is also zero, which indicates an open-circuit fault. Therefore by solving parameter $\theta$, we are able diagnosis OCF in multi-phase interleaved DC-DC converter.
+
+\section{Simulation Results} \label{sec:results}
+Simulations are carried out in Matlab and Simulink in order to evaluate the proposed method. The Simulink model of a 3 phase interleaved boost converter is shown in Fig.8, and circuit parameters are provided in Table I.
+\begin{table}[!hbp]
+\centering
+\caption{Parameters of Converter}
+\begin{tabular}[width=2\textwidth]{ccc}
+\hline
+ Parameter & Description & Vaule\\
+\hline
+$V_{i}$ & Input DC voltage & 12V \\
+L & Inductor value & 0.01H \\
+C & Capacitance value & 1$\mu$F \\
+R & Load resistance & 300$\Omega$ \\
+$f_{sw}$ & Switching frequency & 1.7KHz\\
+\hline
+\end{tabular}
+\end{table}
+
+The proposed method requires inductor currents of healthy phases remain periodic and symmetric after OCF occurs in one phase, which can only be satisfied in DCM mode. Therefore, in this simulation we choose large load resistance to make sure the circuit works in DCM mode. The flow chart of the fault diagnosis system is shown in Fig.9.
+
+In the simulation, a PWM module produces three symmetrical control signals for IGBTs in the circuit based on a given duty cycle. Meanwhile, we add 3 trigger signals to the circuit. Once a trigger signal is set to zero, control signal of this branch will be disconnected, which simulates an open-circuit fault. In order to estimate DC-link current and phase current value, the fault diagnosis module also need to pre-store a period of inductor current value of T1, using the IGBT control signal to locate the beginning of a period. Also, to make simulation data closer the real ones, DC-link current and the pre-collected inductor are mixed with an appropriate amount of Gaussian white noise.
+
+DC-link current value will be collected and then processes by the fault diagnosis module, the output of which is system parameters that represent working states of each phase. If the parameter of one phase is close to 1, then this phase is operating normally. If the parameter is close to 0, that indicates an OCF in this phase.
+
+\subsection{simulation result}
+An OCF in $T_{1}$ at $t_{e}=0.006s$ is investigated. The converter works in DCM mode, with the duty cycle of $50\%$.  DC-link current, inductor phase currents, trigger signals and the pre-stored current under the same duty cycle are shown in Fig.10(a)-(d). \\
+\begin{figure}[!htbp]
+\centering
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig6a.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig6b.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig6c.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig6d.pdf}}
+\caption{Fig}
+\end{figure}
+After the OFC occurs, $I_{1}$ decrease to zero, and the rest phase current waveforms remain the same. Also there is a significant ripple increase in DC-link current. DC-link current is process by the fault diagnosis module once a period and then calculate system parameters using equation (21) (23) (24).  The output of fault diagnosis module is shown in Fig.11.
+
+When the OCF in $T_{1}$ occurs at $t_{e}=0.006s$, parameter $\theta$ starts decreasing at $t=0.006s$, and eventually it is close to zero. Meanwhile, parameters of the rest healthy phases remain close to one. Simulation result proves that the proposed method can diagnosis OCF within a period.
+\begin{figure}[t]
+\centerline{\includegraphics[width=0.45\textwidth]{fig7.pdf}}
+\caption{F}
+\end{figure}
+
+Two phase OCF
+\begin{figure}[!htbp]
+\centering
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig8a.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig8b.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig8c.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig8d.pdf}}
+\caption{(a)(b)(c)(d)}
+\end{figure}
+
+\subsection{Robustness analysis}
+In the simulation above, the pre-stored data and the input DC-link current of diagnosis module have the same duty cycle. In order to test the robustness of our method, we pre-store a period of inductor current values with the duty cycle of $50\%$, and then use the diagnosis module to process DC-link current with the duty cycle varies between $45\%$ and $55\%$. The output of diagnosis module is shown in Fig.12. It can be seen that if the duty cycle difference between the pro-store data and diagnosis module input is in a small range, it will not affect the diagnosis. For actual application, we can pre-store a set of phase current data with different duty cycles, and use the one that is closest to the actual duty cycle.
+\begin{figure}[!htbp]
+\centering
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig9a.pdf}}
+\subfigure[]{\includegraphics[width=0.45\textwidth]{fig9b.pdf}}
+\caption{(a)(b)}
+\end{figure}
+
+\section{Discussion and Conclusion} \label{sec:conclusion}
+In this paper, a fast yet efficient fault diagnosis method for interleaved DC-DC converters based on signal decomposition is proposed. Using the relationship between DC-link current and inductor phase currents, we build a linear model, in which parameters intuitively represent the states of each phase. We are able to accurately diagnosis an open-circuit fault with in a switching cycle, according to parameter values estimated by the LS algorithm. Based on a simple relationship between DC-link current and phase current, our method can be applied directly to n-phase interleaved DC-DC converters including boost and buck converter, without analyzing the circuit specifically. For multi-phase converters, if OCF occurs in more than one phase at the same time, the proposed method is capable of diagnosing them all. Moreover, for a n-phase circuit, our method only needs n sets of current values, which requires low sampling frequency and simple calculation. Simulations are carried out to evaluate the robustness and effectiveness of our method, using a three phase boost converter as an example. To estimate all phase currents, a period of sample phase current value of one phase is pre-store. However, for actual application, circuit parameters such as load resistance and duty cycle might not be the same as the ones we used for collecting the sample data. In simulation, this method is proved to be robust, and not affected by parameter difference as long as the circuit operates in DCM mode. Besides, on account of using simple blocks and mature algorithm, our diagnosis method is suitable for implementation on high-speed digital device like FPGA.
+
+
+
+
+
+\bibliographystyle{IEEEtran}
+%\bibliography{IEEEabrv,ref}
+
+\bibliography{Fault_Diagnosis}
+%\bibliographystyle{plain}
+
+\end{document}
