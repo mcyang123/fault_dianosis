@@ -54,7 +54,7 @@ As the requirement of reliability rises, a large number of open-circuit fault di
 
 In this paper, a simple yet effective fault diagnosis method is presented for multi-phase interleaved DC-DC converters. This method is based on signal decomposition, using only DC-link current,switch gate signals,and a period of pre-stored inductor phase current value, instead of monitoring inductor current of each phases. A linear model is built based on the fact that input current equals to the sum of each inductor phase current. By estimating model parameters, we can obtain the conditions all phases within one switching cycle. Using only the common relationship between input current and inductor phase currents, our method could be applied on all kinds of interleaved DC-DC converters and be easily generalized to $n$ phase. Effectiveness and robustness of our method are evaluate by simulations.
 
-The rest part of this paper is organized as follows. In section \uppercase\expandafter{\romannumeral2},3-phase interleaved boost converter is chosen as an example for analyzing circuit principle.Our fault diagnosis method is presented in section \uppercase\expandafter{\romannumeral3}. Then in section \uppercase\expandafter{\romannumeral4}, the method is verified by simulations. Finally, discussion and conclusions are provided in section \uppercase\expandafter{\romannumeral5} and section \uppercase\expandafter{\romannumeral6}, respectively.
+The rest part of this paper is organized as follows. In section \uppercase\expandafter{\romannumeral2}, 3-phase interleaved boost converter is chosen as an example for analyzing circuit principle.Our fault diagnosis method is presented in section \uppercase\expandafter{\romannumeral3}. Then in section \uppercase\expandafter{\romannumeral4}, the method is verified by simulations. Finally, discussion and conclusions are provided in section \uppercase\expandafter{\romannumeral5} and section \uppercase\expandafter{\romannumeral6}, respectively.
 
 \section{Multi-phase interleaved DC-DC converter} \label{sec:converter}
 
@@ -143,21 +143,13 @@ In this section, we propose a method based on signal decomposition, using the re
 Apparently our method requires phase currents to be periodic and symmetric regardless of the fault, so this method can only be applied in DCM mode.
 
 \subsection{System modeling}
-$I_{k}(t)$ is taken as the inductor current value of k-th phase at the time t. According to \ref{con:1} ,inductor currents are periodic
-\begin{equation}\label{eq:6}
-i_{n}(t)=i_{n}(t+T)
-\end{equation}
-According to conclusion 2, relationship between inductor phase currents is
-\begin{equation}\label{eq:7}
-i_{1}(t)=i_{2}(t+\frac{T}{n})=i_{3}(t+\frac{2T}{n})=...=i_{n}(t+\frac{(n-1)T}{n})
-\end{equation}
-According to conclusion 1 and 2, inductor phase currents are periodic and symmetric with each other. Therefore, using \eqref{eq:6} and \eqref{eq:7} we can calculate all inductor currents with only one period of current signal of one phase. Conclusion 4 makes sure that, in DCM mode, inductor current waveforms of the rest healthy phases remain the same, regardless of the OCF, and they always satisfy \eqref{eq:6} and \eqref{eq:7}.\eqref{eq:1} can be generalized to k phase as\\
+Equation \eqref{eq:1} in section \uppercase\expandafter{\romannumeral2} can be generalized to k phase as\\
 \begin{equation}\label{eq:8}
-i_{in}(t)=i_{1}(t)+i_{2}(t)+...+i_{n}(t)
+I_{i}(t)=I_{1}(t)+I_{2}(t)+...+I_{k}(t)
 \end{equation}
 Assumed that an OCF occurs in T1, DC-link current is equal to sum of inductor currents of the rest healthy phases\\
 \begin{equation}\label{eq:9}
-i_{in}(t)=i_{2}(t)+i_{3}(t)+...+i_{n}(t)
+I_{i}(t)=I_{2}(t)+I_{3}(t)+...+I_{k}(t)
 \end{equation}
 
 From previous analysis, when an OCF occurs in one phase, its inductor current will decrease to zero. In another word, when decomposing the DC-link current, the current component of the fault phase is also zero. In order to fit in both healthy and faulty operating mode, equation (7) can be written as follow:\\
@@ -166,6 +158,17 @@ i_{in}(t)=\theta_{1}\cdot i_{1}(t)+\theta_{2}\cdot i_{2}(t)+...+\theta_{n}\cdot 
 \end{equation}
 
 Apparently, when OCF occurs in $T_{k}$(k=1,2,3¡­n),$\theta_{k}$ equals to zero, and for the rest healthy ones,$\theta$ equals to 1. Parameter $\theta$ intuitively represent the working conditions of each phase, therefore solving parameter $\theta$ is the key to fault diagnosis.
+
+$I_{k}(t)$ is taken as the inductor current value of k-th phase at the time t. According to \ref{con:1} ,inductor currents are periodic
+\begin{equation}\label{eq:6}
+i_{n}(t)=i_{n}(t+T)
+\end{equation}
+According to conclusion 2, relationship between inductor phase currents is
+\begin{equation}\label{eq:7}
+i_{1}(t)=i_{2}(t+\frac{T}{n})=i_{3}(t+\frac{2T}{n})=...=i_{n}(t+\frac{(n-1)T}{n})
+\end{equation}
+According to conclusion 1 and 2, inductor phase currents are periodic and symmetric with each other. Therefore, using \eqref{eq:6} and \eqref{eq:7} we can calculate all inductor currents with only one period of current signal of one phase. Conclusion 4 makes sure that, in DCM mode, inductor current waveforms of the rest healthy phases remain the same, regardless of the OCF, and they always satisfy \eqref{eq:6} and \eqref{eq:7}.
+
 Combining equation \eqref{eq:7} and \eqref{eq:10}, we can have\\
 \begin{eqnarray}\label{eq:11}
 \lefteqn{i_{in}(t)=\theta_{1}\cdot i_{1}(t)+\theta_{2}\cdot i_{1}(t-\frac{T}{n})+{} }
